@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////
+// STUDENT
+//////////////////////////////////////////////////////
+
+model Student {
+  id          String       @id @default(uuid())
+  name        String
+  email       String       @unique
+  age         Int
+
+  enrollments Enrollment[]
+  marks       Mark[]
+
+  createdAt   DateTime     @default(now())
+}
+
+//////////////////////////////////////////////////////
+// TEACHER
+//////////////////////////////////////////////////////
+
+model Teacher {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+
+  courses   Course[]
+
+  createdAt DateTime  @default(now())
+}
+
+//////////////////////////////////////////////////////
+// COURSE
+//////////////////////////////////////////////////////
+
+model Course {
+  id          String       @id @default(uuid())
+  title       String
+
+  teacherId   String
+  teacher     Teacher      @relation(fields: [teacherId], references: [id])
+
+  enrollments Enrollment[]
+  marks       Mark[]
+
+  createdAt   DateTime     @default(now())
+}
+
+//////////////////////////////////////////////////////
+// ENROLLMENT
+//////////////////////////////////////////////////////
+
+model Enrollment {
+  id         String    @id @default(uuid())
+
+  studentId  String
+  courseId   String
+
+  student    Student   @relation(fields: [studentId], references: [id])
+  course     Course    @relation(fields: [courseId], references: [id])
+
+  enrolledAt DateTime  @default(now())
+}
+
+//////////////////////////////////////////////////////
+// MARKS
+//////////////////////////////////////////////////////
+
+model Mark {
+  id         String   @id @default(uuid())
+
+  studentId  String
+  courseId   String
+
+  student    Student  @relation(fields: [studentId], references: [id])
+  course     Course   @relation(fields: [courseId], references: [id])
+
+  score      Int
+
+  createdAt  DateTime @default(now())
+}
